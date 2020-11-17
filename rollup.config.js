@@ -43,14 +43,7 @@ export default [
         sourcemap: false
       }
     ],
-    plugins: config.plugins.concat([
-      IS_PUBLISH &&
-        terser({
-          compress: {
-            passes: 2
-          }
-        })
-    ]),
+    plugins: config.plugins,
     external: config.external
   },
   {

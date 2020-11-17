@@ -1,5 +1,5 @@
 import request, { CoreOptions } from 'request'
-import { extend } from 'lodash'
+import extend from 'extend'
 
 /** fetcher 配置 */
 export interface FetcherOption {
@@ -69,7 +69,7 @@ export class Fetcher {
 
   /** get 请求 */
   get<I = {}, O = {}>(url: string, req?: I, option?: FetcherOption['requestOption']) {
-    const { defaultProtocol, timeout, requestOption } = this
+    const { requestOption } = this
     const rUrl = this.formatUrl(url)
     const logPrefix = `请求${rUrl}`
 
@@ -78,7 +78,10 @@ export class Fetcher {
       ...requestOption
     }
     if (requestOption) {
-      param = extend<FetcherProperty['requestOption']>(param, option)
+      param = extend<FetcherProperty['requestOption'], FetcherOption['requestOption']>(
+        param,
+        option
+      )
     }
 
     return new Promise<O>((resolve, reject) => {
@@ -88,10 +91,10 @@ export class Fetcher {
             try {
               resolve(JSON.parse(body))
             } catch (er) {
-              reject(new Error(`parse error: ${body}`))
+              reject(new Error(`${logPrefix}失败: parse error: ${body}`))
             }
           } else {
-            reject(new Error(`状态非 200: ${res.statusCode}`))
+            reject(new Error(`${logPrefix}失败: 状态非 200: ${res.statusCode}`))
           }
         } else {
           reject(err)
@@ -102,7 +105,7 @@ export class Fetcher {
 
   /** post 请求 */
   post<I = {}, O = {}>(url: string, req?: I, option?: FetcherOption['requestOption']) {
-    const { defaultProtocol, timeout, requestOption } = this
+    const { requestOption } = this
     const rUrl = this.formatUrl(url)
     const logPrefix = `请求${rUrl}`
 
@@ -111,7 +114,10 @@ export class Fetcher {
       ...requestOption
     }
     if (requestOption) {
-      param = extend<FetcherProperty['requestOption']>(param, option)
+      param = extend<FetcherProperty['requestOption'], FetcherOption['requestOption']>(
+        param,
+        option
+      )
     }
 
     return new Promise<O>((resolve, reject) => {
@@ -121,10 +127,10 @@ export class Fetcher {
             try {
               resolve(JSON.parse(body))
             } catch (er) {
-              reject(new Error(`parse error: ${body}`))
+              reject(new Error(`${logPrefix}失败: parse error: ${body}`))
             }
           } else {
-            reject(new Error(`状态非 200: ${res.statusCode}`))
+            reject(new Error(`${logPrefix}失败: 状态非 200: ${res.statusCode}`))
           }
         } else {
           reject(err)

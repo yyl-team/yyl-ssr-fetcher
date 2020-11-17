@@ -28,7 +28,7 @@ const config = {
       typescript: require('typescript')
     })
   ],
-  external: ['request']
+  external: ['request', 'extend']
 }
 
 export default [

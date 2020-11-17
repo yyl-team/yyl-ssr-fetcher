@@ -1,16 +1,10 @@
 /*!
- * yyl-ssr-fetcher cjs 0.1.0
+ * yyl-ssr-fetcher esm 0.1.0
  * (c) 2020 - 2020 jackness
  * Released under the MIT License.
  */
-'use strict';
-
-Object.defineProperty(exports, '__esModule', { value: true });
-
-function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'default' in ex) ? ex['default'] : ex; }
-
-var request = _interopDefault(require('request'));
-var extend = _interopDefault(require('extend'));
+import request from 'request';
+import extend from 'extend';
 
 /** 无协议匹配 */
 const NO_PROTOCOL_REG = /^\/\//;
@@ -115,4 +109,4 @@ class Fetcher {
     }
 }
 
-exports.Fetcher = Fetcher;
+export { Fetcher };

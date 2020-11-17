@@ -34,13 +34,13 @@
     "w": "rollup --watch --config ./rollup.config.js",
     "release": "yyr",
     "prepublishOnly": "npm run prettier & npm run build",
-    "test": "cd ./test/case/base && npm run d",
-    "install:test": "cd ./test/case/base && yarn install"
+    "test": "jest ./test/jest"
   },
   "devDependencies": {
     "cross-env": "^5.2.0",
     "eslint": "^6.8.0",
     "eslint-config-yyl-react": "^0.1.9",
+    "jest": "^26.6.3",
     "prettier": "^2.0.4",
     "rollup": "^1.9.0",
     "rollup-plugin-commonjs": "^9.3.4",

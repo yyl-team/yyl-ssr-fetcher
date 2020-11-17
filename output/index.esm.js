@@ -1,5 +1,5 @@
 /*!
- * yyl-ssr-fetcher esm 0.1.0
+ * yyl-ssr-fetcher esm 0.1.1
  * (c) 2020 - 2020 jackness
  * Released under the MIT License.
  */
@@ -14,7 +14,7 @@ const DEFAULT_UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36
 class Fetcher {
     constructor(option) {
         /** 超时时间 */
-        this.timeout = 3000;
+        this.timeout = 5000;
         /** 请求ua */
         this.userAgent = DEFAULT_UA;
         /** request 配置 */
@@ -57,7 +57,7 @@ class Fetcher {
             param = extend(param, option);
         }
         return new Promise((resolve, reject) => {
-            request.get(url, param, (err, res, body) => {
+            request.get(rUrl, param, (err, res, body) => {
                 if (!err) {
                     if (res.statusCode === 200) {
                         try {
@@ -87,7 +87,7 @@ class Fetcher {
             param = extend(param, option);
         }
         return new Promise((resolve, reject) => {
-            request.post(url, param, (err, res, body) => {
+            request.post(rUrl, param, (err, res, body) => {
                 if (!err) {
                     if (res.statusCode === 200) {
                         try {

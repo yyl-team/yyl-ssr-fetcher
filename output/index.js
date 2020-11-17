@@ -1,6 +1,118 @@
 /*!
- * yyl-ssr-fetcher cjs 0.1.1
+ * yyl-ssr-fetcher cjs 0.1.2
  * (c) 2020 - 2020 jackness
  * Released under the MIT License.
  */
-"use strict";function e(e){return e&&"object"==typeof e&&"default"in e?e.default:e}Object.defineProperty(exports,"__esModule",{value:!0});var t=e(require("request")),r=e(require("extend"));const s=/^\/\//;exports.Fetcher=class{constructor(e){this.timeout=5e3,this.userAgent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.122 Safari/537.36 ServerSide",this.requestOption={},this.defaultProtocol="http:",(null==e?void 0:e.timeout)&&(this.timeout=e.timeout),(null==e?void 0:e.userAgent)&&(this.userAgent=e.userAgent),(null==e?void 0:e.requestOption)&&(this.requestOption=e.requestOption),this.requestOption=r({headers:{"User-Agent":this.userAgent},timeout:this.timeout},this.requestOption)}formatUrl(e){const{defaultProtocol:t}=this;let r=e;return r.match(s)&&(r=`${t}${r}`),r}get(e,s,o){const{requestOption:i}=this,u=this.formatUrl(e),n="请求"+u;let a=Object.assign({qs:s||{}},i);return i&&(a=r(a,o)),new Promise((e,r)=>{t.get(u,a,(t,s,o)=>{if(t)r(t);else if(200===s.statusCode)try{e(JSON.parse(o))}catch(e){r(new Error(`${n}失败: parse error: ${o}`))}else r(new Error(`${n}失败: 状态非 200: ${s.statusCode}`))})})}post(e,s,o){const{requestOption:i}=this,u=this.formatUrl(e),n="请求"+u;let a=Object.assign({formData:s||{}},i);return i&&(a=r(a,o)),new Promise((e,r)=>{t.post(u,a,(t,s,o)=>{if(t)r(t);else if(200===s.statusCode)try{e(JSON.parse(o))}catch(e){r(new Error(`${n}失败: parse error: ${o}`))}else r(new Error(`${n}失败: 状态非 200: ${s.statusCode}`))})})}};
+'use strict';
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'default' in ex) ? ex['default'] : ex; }
+
+var request = _interopDefault(require('request'));
+var extend = _interopDefault(require('extend'));
+
+/** 无协议匹配 */
+const NO_PROTOCOL_REG = /^\/\//;
+/** 默认ua */
+const DEFAULT_UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.122 Safari/537.36 ServerSide';
+/** fetcher 主函数 */
+class Fetcher {
+    constructor(option) {
+        /** 超时时间 */
+        this.timeout = 5000;
+        /** 请求ua */
+        this.userAgent = DEFAULT_UA;
+        /** request 配置 */
+        this.requestOption = {};
+        /** 默认 protocol */
+        this.defaultProtocol = 'http:';
+        if (option === null || option === void 0 ? void 0 : option.timeout) {
+            this.timeout = option.timeout;
+        }
+        if (option === null || option === void 0 ? void 0 : option.userAgent) {
+            this.userAgent = option.userAgent;
+        }
+        if (option === null || option === void 0 ? void 0 : option.requestOption) {
+            this.requestOption = option.requestOption;
+        }
+        // request option 配置
+        this.requestOption = extend({
+            headers: {
+                'User-Agent': this.userAgent
+            },
+            timeout: this.timeout
+        }, this.requestOption);
+    }
+    /** url 格式化 */
+    formatUrl(url) {
+        const { defaultProtocol } = this;
+        let rUrl = url;
+        if (rUrl.match(NO_PROTOCOL_REG)) {
+            rUrl = `${defaultProtocol}${rUrl}`;
+        }
+        return rUrl;
+    }
+    /** get 请求 */
+    get(url, req, option) {
+        const { requestOption } = this;
+        const rUrl = this.formatUrl(url);
+        const logPrefix = `请求${rUrl}`;
+        let param = Object.assign({ qs: req || {} }, requestOption);
+        if (requestOption) {
+            param = extend(param, option);
+        }
+        return new Promise((resolve, reject) => {
+            request.get(rUrl, param, (err, res, body) => {
+                if (!err) {
+                    if (res.statusCode === 200) {
+                        try {
+                            resolve(JSON.parse(body));
+                        }
+                        catch (er) {
+                            reject(new Error(`${logPrefix}失败: parse error: ${body}`));
+                        }
+                    }
+                    else {
+                        reject(new Error(`${logPrefix}失败: 状态非 200: ${res.statusCode}`));
+                    }
+                }
+                else {
+                    reject(err);
+                }
+            });
+        });
+    }
+    /** post 请求 */
+    post(url, req, option) {
+        const { requestOption } = this;
+        const rUrl = this.formatUrl(url);
+        const logPrefix = `请求${rUrl}`;
+        let param = Object.assign({ formData: req || {} }, requestOption);
+        if (requestOption) {
+            param = extend(param, option);
+        }
+        return new Promise((resolve, reject) => {
+            request.post(rUrl, param, (err, res, body) => {
+                if (!err) {
+                    if (res.statusCode === 200) {
+                        try {
+                            resolve(JSON.parse(body));
+                        }
+                        catch (er) {
+                            reject(new Error(`${logPrefix}失败: parse error: ${body}`));
+                        }
+                    }
+                    else {
+                        reject(new Error(`${logPrefix}失败: 状态非 200: ${res.statusCode}`));
+                    }
+                }
+                else {
+                    reject(err);
+                }
+            });
+        });
+    }
+}
+
+exports.Fetcher = Fetcher;

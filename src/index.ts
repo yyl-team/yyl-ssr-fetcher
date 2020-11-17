@@ -26,7 +26,7 @@ const DEFAULT_UA =
 /** fetcher 主函数 */
 export class Fetcher {
   /** 超时时间 */
-  private timeout: FetcherProperty['timeout'] = 3000
+  private timeout: FetcherProperty['timeout'] = 5000
   /** 请求ua */
   private userAgent: FetcherProperty['userAgent'] = DEFAULT_UA
   /** request 配置 */
@@ -85,7 +85,7 @@ export class Fetcher {
     }
 
     return new Promise<O>((resolve, reject) => {
-      request.get(url, param, (err, res, body) => {
+      request.get(rUrl, param, (err, res, body) => {
         if (!err) {
           if (res.statusCode === 200) {
             try {
@@ -121,7 +121,7 @@ export class Fetcher {
     }
 
     return new Promise<O>((resolve, reject) => {
-      request.post(url, param, (err, res, body) => {
+      request.post(rUrl, param, (err, res, body) => {
         if (!err) {
           if (res.statusCode === 200) {
             try {

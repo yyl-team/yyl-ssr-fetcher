@@ -1,5 +1,5 @@
 {
-  "version": "0.1.2",
+  "version": "0.2.0",
   "main": "output/index.js",
   "module": "output/index.esm.js",
   "types": "output/index.d.ts",
@@ -34,6 +34,7 @@
     "w": "rollup --watch --config ./rollup.config.js",
     "release": "yyr",
     "prepublishOnly": "npm run prettier & npm run build",
+    "pretest": "npm run d",
     "test": "jest ./test/jest"
   },
   "devDependencies": {

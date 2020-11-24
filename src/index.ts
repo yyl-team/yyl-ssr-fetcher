@@ -1,6 +1,29 @@
 import request, { CoreOptions } from 'request'
 import extend from 'extend'
 
+/** 日志类型 */
+export enum LogType {
+  Info = 'info',
+  Success = 'success',
+  Warn = 'warn',
+  Error = 'error'
+}
+
+/** 日志参数 */
+export interface LogProps {
+  /** 日志类型 */
+  type: LogType
+  /** 日志来源 */
+  path: string
+  /** 日志内容 */
+  args: any[]
+}
+
+/** request 配置 */
+export interface RequestOption extends CoreOptions {
+  /** 请求来源-用于logger */
+  ref?: string
+}
 /** fetcher 配置 */
 export interface FetcherOption {
   /** 超时设置 */
@@ -8,9 +31,11 @@ export interface FetcherOption {
   /** 超时设置 */
   userAgent?: string
   /** request 配置 */
-  requestOption?: CoreOptions
+  requestOption?: RequestOption
   /** 默认请求协议 */
   defaultProtocol?: string
+  /** 日志 */
+  logger?: (props: LogProps) => void
 }
 
 /** 无协议匹配 */
@@ -33,6 +58,8 @@ export class Fetcher {
   private requestOption: FetcherProperty['requestOption'] = {}
   /** 默认 protocol */
   private defaultProtocol: FetcherProperty['defaultProtocol'] = 'http:'
+  /** 默认logger */
+  private logger: FetcherProperty['logger'] = () => {}
   constructor(option?: FetcherOption) {
     if (option?.timeout) {
       this.timeout = option.timeout
@@ -72,6 +99,7 @@ export class Fetcher {
     const { requestOption } = this
     const rUrl = this.formatUrl(url)
     const logPrefix = `请求${rUrl}`
+    const ref = option?.ref || rUrl
 
     let param: FetcherProperty['requestOption'] = {
       qs: req || {},
@@ -85,18 +113,46 @@ export class Fetcher {
     }
 
     return new Promise<O>((resolve, reject) => {
+      this.logger({
+        path: ref,
+        type: LogType.Info,
+        args: [logPrefix, '类型 GET', '参数', param]
+      })
       request.get(rUrl, param, (err, res, body) => {
         if (!err) {
           if (res.statusCode === 200) {
             try {
-              resolve(JSON.parse(body))
+              const r = JSON.parse(body)
+              this.logger({
+                path: ref,
+                type: LogType.Success,
+                args: [`${logPrefix} 成功`, '返回值', r]
+              })
+              resolve(r)
             } catch (er) {
-              reject(new Error(`${logPrefix}失败: parse error: ${body}`))
+              const errMsg = `parse error: ${body}`
+              this.logger({
+                path: ref,
+                type: LogType.Error,
+                args: [`${logPrefix} 失败`, errMsg]
+              })
+              reject(new Error(`${logPrefix}失败: ${errMsg}`))
             }
           } else {
-            reject(new Error(`${logPrefix}失败: 状态非 200: ${res.statusCode}`))
+            const errMsg = `状态非 200: ${res.statusCode}`
+            this.logger({
+              path: ref,
+              type: LogType.Error,
+              args: [`${logPrefix} 失败`, errMsg]
+            })
+            reject(new Error(`${logPrefix}失败: ${errMsg}`))
           }
         } else {
+          this.logger({
+            path: ref,
+            type: LogType.Error,
+            args: [`${logPrefix} 失败`, err]
+          })
           reject(err)
         }
       })
@@ -108,6 +164,7 @@ export class Fetcher {
     const { requestOption } = this
     const rUrl = this.formatUrl(url)
     const logPrefix = `请求${rUrl}`
+    const ref = option?.ref || rUrl
 
     let param: FetcherProperty['requestOption'] = {
       formData: req || {},
@@ -121,18 +178,47 @@ export class Fetcher {
     }
 
     return new Promise<O>((resolve, reject) => {
+      this.logger({
+        path: ref,
+        type: LogType.Info,
+        args: [logPrefix, '类型 Post', '参数', param]
+      })
+
       request.post(rUrl, param, (err, res, body) => {
         if (!err) {
           if (res.statusCode === 200) {
             try {
-              resolve(JSON.parse(body))
+              const r = JSON.parse(body)
+              this.logger({
+                path: ref,
+                type: LogType.Success,
+                args: [`${logPrefix} 成功`, '返回值', r]
+              })
+              resolve(r)
             } catch (er) {
-              reject(new Error(`${logPrefix}失败: parse error: ${body}`))
+              const errMsg = `parse error: ${body}`
+              this.logger({
+                path: ref,
+                type: LogType.Error,
+                args: [`${logPrefix} 失败`, errMsg]
+              })
+              reject(new Error(`${logPrefix}失败: ${errMsg}`))
             }
           } else {
-            reject(new Error(`${logPrefix}失败: 状态非 200: ${res.statusCode}`))
+            const errMsg = `状态非 200: ${res.statusCode}`
+            this.logger({
+              path: ref,
+              type: LogType.Error,
+              args: [`${logPrefix} 失败`, errMsg]
+            })
+            reject(new Error(`${logPrefix}失败: ${errMsg}`))
           }
         } else {
+          this.logger({
+            path: ref,
+            type: LogType.Error,
+            args: [`${logPrefix} 失败`, err]
+          })
           reject(err)
         }
       })

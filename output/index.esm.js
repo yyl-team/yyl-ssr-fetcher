@@ -1,11 +1,19 @@
 /*!
- * yyl-ssr-fetcher esm 0.1.2
+ * yyl-ssr-fetcher esm 0.2.0
  * (c) 2020 - 2020 jackness
  * Released under the MIT License.
  */
 import request from 'request';
 import extend from 'extend';
 
+/** 日志类型 */
+var LogType;
+(function (LogType) {
+    LogType["Info"] = "info";
+    LogType["Success"] = "success";
+    LogType["Warn"] = "warn";
+    LogType["Error"] = "error";
+})(LogType || (LogType = {}));
 /** 无协议匹配 */
 const NO_PROTOCOL_REG = /^\/\//;
 /** 默认ua */
@@ -21,6 +29,8 @@ class Fetcher {
         this.requestOption = {};
         /** 默认 protocol */
         this.defaultProtocol = 'http:';
+        /** 默认logger */
+        this.logger = () => { };
         if (option === null || option === void 0 ? void 0 : option.timeout) {
             this.timeout = option.timeout;
         }
@@ -52,26 +62,55 @@ class Fetcher {
         const { requestOption } = this;
         const rUrl = this.formatUrl(url);
         const logPrefix = `请求${rUrl}`;
+        const ref = (option === null || option === void 0 ? void 0 : option.ref) || rUrl;
         let param = Object.assign({ qs: req || {} }, requestOption);
         if (requestOption) {
             param = extend(param, option);
         }
         return new Promise((resolve, reject) => {
+            this.logger({
+                path: ref,
+                type: LogType.Info,
+                args: [logPrefix, '类型 GET', '参数', param]
+            });
             request.get(rUrl, param, (err, res, body) => {
                 if (!err) {
                     if (res.statusCode === 200) {
                         try {
-                            resolve(JSON.parse(body));
+                            const r = JSON.parse(body);
+                            this.logger({
+                                path: ref,
+                                type: LogType.Success,
+                                args: [`${logPrefix} 成功`, '返回值', r]
+                            });
+                            resolve(r);
                         }
                         catch (er) {
-                            reject(new Error(`${logPrefix}失败: parse error: ${body}`));
+                            const errMsg = `parse error: ${body}`;
+                            this.logger({
+                                path: ref,
+                                type: LogType.Error,
+                                args: [`${logPrefix} 失败`, errMsg]
+                            });
+                            reject(new Error(`${logPrefix}失败: ${errMsg}`));
                         }
                     }
                     else {
-                        reject(new Error(`${logPrefix}失败: 状态非 200: ${res.statusCode}`));
+                        const errMsg = `状态非 200: ${res.statusCode}`;
+                        this.logger({
+                            path: ref,
+                            type: LogType.Error,
+                            args: [`${logPrefix} 失败`, errMsg]
+                        });
+                        reject(new Error(`${logPrefix}失败: ${errMsg}`));
                     }
                 }
                 else {
+                    this.logger({
+                        path: ref,
+                        type: LogType.Error,
+                        args: [`${logPrefix} 失败`, err]
+                    });
                     reject(err);
                 }
             });
@@ -82,26 +121,55 @@ class Fetcher {
         const { requestOption } = this;
         const rUrl = this.formatUrl(url);
         const logPrefix = `请求${rUrl}`;
+        const ref = (option === null || option === void 0 ? void 0 : option.ref) || rUrl;
         let param = Object.assign({ formData: req || {} }, requestOption);
         if (requestOption) {
             param = extend(param, option);
         }
         return new Promise((resolve, reject) => {
+            this.logger({
+                path: ref,
+                type: LogType.Info,
+                args: [logPrefix, '类型 Post', '参数', param]
+            });
             request.post(rUrl, param, (err, res, body) => {
                 if (!err) {
                     if (res.statusCode === 200) {
                         try {
-                            resolve(JSON.parse(body));
+                            const r = JSON.parse(body);
+                            this.logger({
+                                path: ref,
+                                type: LogType.Success,
+                                args: [`${logPrefix} 成功`, '返回值', r]
+                            });
+                            resolve(r);
                         }
                         catch (er) {
-                            reject(new Error(`${logPrefix}失败: parse error: ${body}`));
+                            const errMsg = `parse error: ${body}`;
+                            this.logger({
+                                path: ref,
+                                type: LogType.Error,
+                                args: [`${logPrefix} 失败`, errMsg]
+                            });
+                            reject(new Error(`${logPrefix}失败: ${errMsg}`));
                         }
                     }
                     else {
-                        reject(new Error(`${logPrefix}失败: 状态非 200: ${res.statusCode}`));
+                        const errMsg = `状态非 200: ${res.statusCode}`;
+                        this.logger({
+                            path: ref,
+                            type: LogType.Error,
+                            args: [`${logPrefix} 失败`, errMsg]
+                        });
+                        reject(new Error(`${logPrefix}失败: ${errMsg}`));
                     }
                 }
                 else {
+                    this.logger({
+                        path: ref,
+                        type: LogType.Error,
+                        args: [`${logPrefix} 失败`, err]
+                    });
                     reject(err);
                 }
             });
@@ -109,4 +177,4 @@ class Fetcher {
     }
 }
 
-export { Fetcher };
+export { Fetcher, LogType };

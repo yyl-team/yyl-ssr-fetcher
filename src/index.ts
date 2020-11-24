@@ -82,6 +82,11 @@ export class Fetcher {
       },
       this.requestOption
     )
+
+    // logger 初始化
+    if (option?.logger) {
+      this.logger = option.logger
+    }
   }
 
   /** url 格式化 */

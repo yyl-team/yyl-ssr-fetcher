@@ -1,5 +1,5 @@
 /*!
- * yyl-ssr-fetcher esm 0.2.0
+ * yyl-ssr-fetcher esm 0.2.1
  * (c) 2020 - 2020 jackness
  * Released under the MIT License.
  */
@@ -47,6 +47,10 @@ class Fetcher {
             },
             timeout: this.timeout
         }, this.requestOption);
+        // logger 初始化
+        if (option === null || option === void 0 ? void 0 : option.logger) {
+            this.logger = option.logger;
+        }
     }
     /** url 格式化 */
     formatUrl(url) {

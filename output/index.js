@@ -1,5 +1,5 @@
 /*!
- * yyl-ssr-fetcher cjs 0.2.1
+ * yyl-ssr-fetcher cjs 0.2.2
  * (c) 2020 - 2020 jackness
  * Released under the MIT License.
  */

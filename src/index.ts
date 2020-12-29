@@ -101,6 +101,7 @@ export class Fetcher {
 
   /** get 请求 */
   get<I = {}, O = {}>(url: string, req?: I, option?: FetcherOption['requestOption']) {
+    const start = +new Date()
     const { requestOption } = this
     const rUrl = this.formatUrl(url)
     const logPrefix = `请求${rUrl}`
@@ -124,6 +125,7 @@ export class Fetcher {
         args: [logPrefix, '类型 GET', '参数', param]
       })
       request.get(rUrl, param, (err, res, body) => {
+        const cost = +new Date() - start
         if (!err) {
           if (res.statusCode === 200) {
             try {
@@ -131,7 +133,7 @@ export class Fetcher {
               this.logger({
                 path: ref,
                 type: LogType.Success,
-                args: [`${logPrefix} 成功`, '返回值', r]
+                args: [`${logPrefix} 成功(${cost}ms)`, '返回值', r]
               })
               resolve(r)
             } catch (er) {
@@ -166,6 +168,7 @@ export class Fetcher {
 
   /** post 请求 */
   post<I = {}, O = {}>(url: string, req?: I, option?: FetcherOption['requestOption']) {
+    const start = +new Date()
     const { requestOption } = this
     const rUrl = this.formatUrl(url)
     const logPrefix = `请求${rUrl}`
@@ -190,6 +193,7 @@ export class Fetcher {
       })
 
       request.post(rUrl, param, (err, res, body) => {
+        const cost = +new Date() - start
         if (!err) {
           if (res.statusCode === 200) {
             try {
@@ -197,7 +201,7 @@ export class Fetcher {
               this.logger({
                 path: ref,
                 type: LogType.Success,
-                args: [`${logPrefix} 成功`, '返回值', r]
+                args: [`${logPrefix} 成功(${cost})ms`, '返回值', r]
               })
               resolve(r)
             } catch (er) {

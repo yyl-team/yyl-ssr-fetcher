@@ -54,7 +54,7 @@
   },
   "name": "yyl-ssr-fetcher",
   "repository": "https://github.com/jackness1208/yyl-ssr-fetcher.git",
-  "author": "liudaojie <liudaojie@yy.com>",
+  "author": "jackness1208",
   "license": "MIT",
   "dependencies": {
     "@types/extend": "^3.0.1",
